@@ -13,7 +13,7 @@
 </div>
 
 <p align="center">
-  <img src="https://placehold.co/600x300/4F46E5/FFFFFF?text=FlowSight+Logo" alt="FlowSight Logo" width="600"/>
+  <img src="https://github.com/LOMI1015/flowsight/blob/main/docs/images/logo.png?raw=true" alt="FlowSight Logo" width="600"/>
 </p>
 
 <div align="center">
