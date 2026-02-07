@@ -10,14 +10,6 @@
 [![](https://img.shields.io/badge/Made%20with-Python%2BVue3-red?style=for-the-badge&logo=python)](https://www.python.org/)
 [![](https://img.shields.io/badge/Deploy-Docker-blue?style=for-the-badge&logo=docker)](https://www.docker.com/)
 
-</div>
-
-<p align="center">
-  <img src="https://github.com/LOMI1015/flowsight/blob/main/docs/images/logo.png?raw=true" alt="FlowSight Logo" width="600"/>
-</p>
-
-<div align="center">
-
 **🌊 数据流** | **👁️ 可视化** | **⚡ 实时标注** | **📊 洞察力**
 
 </div>
@@ -52,17 +44,3 @@ FlowSight 是一个现代化的开源数据中台，旨在简化从原始数据�
 | **部署** | [Docker](https://www.docker.com/) + [Nginx](https://nginx.org/) | 容器化部署与反向代理 |
 
 ---
-
-## 📦 快速开始
-
-### 前提条件
-
-- [Git](https://git-scm.com/downloads)
-- [Docker](https://docs.docker.com/get-docker/) & [Docker Compose](https://docs.docker.com/compose/install/)
-- [Node.js](https://nodejs.org/en/download/) (可选，本地开发前端)
-
-### 1. 克隆项目
-
-```bash
-git clone https://github.com/LOMI1015/flowsight.git
-cd flowsight
