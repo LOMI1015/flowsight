@@ -6,7 +6,7 @@ from typing import Any, Dict, Iterable, Literal, Optional, Union
 from pydantic_validation_decorator import ValidateFields
 from config.get_db import get_db
 from config.enums import BusinessType
-from config.env import UploadConfig
+from config.env import MinioConfig, UploadConfig
 from exceptions.exception import ServiceException
 from module_admin.annotation.log_annotation import Log
 from module_admin.aspect.data_scope import GetDataScope
@@ -28,6 +28,7 @@ from module_admin.entity.vo.user_vo import (
     UserRoleQueryModel,
     UserRoleResponseModel,
 )
+from module_admin.service.config_service import ConfigService
 from module_admin.service.login_service import LoginService
 from module_admin.service.user_service import UserService
 from module_admin.service.role_service import RoleService
@@ -45,25 +46,21 @@ userController = APIRouter(prefix='/system/user', dependencies=[Depends(LoginSer
 
 def _build_avatar_url(request: Request, avatar: Optional[str]) -> Optional[str]:
     """
-    根据请求信息为头像地址补全访问前缀
+    根据 Minio 配置将头像相对路径拼接为完整访问 URL
     """
     if not avatar:
         return avatar
-    if avatar.startswith(('http://8.134.192.226:9000/art-data/', 'https://8.134.192.226:9000/art-data/')):
+    # 已是完整 URL 时直接返回（支持 http/https）
+    if avatar.startswith(('http://', 'https://')):
         return avatar
-    base_url = str('http://8.134.192.226:9000/art-data/')
-    if not base_url.endswith('/'):
-        base_url = f'{base_url}/'
+    protocol = 'https' if MinioConfig.minio_secure else 'http'
+    host = (MinioConfig.minio_host or '').strip()
+    port = MinioConfig.minio_port or 9000
+    bucket = (MinioConfig.minio_bucket or '').strip().strip('/')
+    if not host:
+        return avatar
+    base_url = f'{protocol}://{host}:{port}/{bucket}/' if bucket else f'{protocol}://{host}:{port}/'
     return f'{base_url}{avatar.lstrip("/")}'
-
-
-def _inject_avatar_prefix(request: Request, users: Iterable[Dict[str, Any]]) -> None:
-    """
-    为用户列表中的头像地址补全访问前缀
-    """
-    for user in users:
-        if isinstance(user, dict) and 'avatar' in user:
-            user['avatar'] = _build_avatar_url(request, user.get('avatar'))
 
 
 @userController.get('/deptTree', dependencies=[Depends(CheckUserInterfaceAuth('system:user:list'))])
@@ -92,9 +89,8 @@ async def get_system_user_list(
     logger.info('获取成功')
     payload = user_page_query_result.model_dump(by_alias=True)
     rows = payload.pop('rows', [])
-    _inject_avatar_prefix(request, rows)
 
-    return ResponseUtil.success(data=rows,dict_content=payload)
+    return ResponseUtil.success(rows=rows,dict_content=payload)
 
 
 @userController.post('', dependencies=[Depends(CheckUserInterfaceAuth('system:user:add'))])
@@ -113,14 +109,17 @@ async def add_system_user(
         await RoleService.check_role_data_scope_services(
             query_db, ','.join([str(item) for item in add_user.role_ids]), role_data_scope_sql
         )
-    
-    # 如果用户类型为00（系统用户）且没有提供密码，使用默认密码
-    if add_user.user_type == '00' and not add_user.password:
-        add_user.password = 'si123456.'
-    elif not add_user.password:
-        # 如果用户类型不是00且没有提供密码，抛出异常
-        raise ServiceException(message='非系统用户必须提供密码')
-    
+
+    # 密码为空时，使用参数管理中配置的默认密码（sys.user.initPassword）
+    if not add_user.password or not str(add_user.password).strip():
+        default_password = await ConfigService.query_config_list_from_cache_services(
+            request.app.state.redis, 'sys.user.initPassword'
+        )
+        if default_password and str(default_password).strip():
+            add_user.password = str(default_password).strip()
+        else:
+            raise ServiceException(message='未配置默认密码（参数管理中添加 sys.user.initPassword），且未填写密码')
+
     add_user.password = PwdUtil.get_password_hash(add_user.password)
     add_user.create_by = current_user.user.user_name
     add_user.create_time = datetime.now()

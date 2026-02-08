@@ -29,7 +29,7 @@ class JwtSettings(BaseSettings):
     Jwt配置
     """
 
-    jwt_secret_key: str = 'b01c66dc2c58dc6a0aabfe2144256be36226de378bf87f72c0c795dda67f4d55'
+    jwt_secret_key: str
     jwt_algorithm: str = 'HS256'
     jwt_expire_minutes: int = 1440
     jwt_redis_expire_minutes: int = 30
@@ -59,40 +59,6 @@ class DataBaseSettings(BaseSettings):
             return 'postgres'
         return self.db_type
 
-
-class TaskDataBaseSettings(BaseSettings):
-    """
-    定时任务数据存储数据库配置（默认 PostgreSQL）
-    """
-
-    task_db_type: Literal['postgresql'] = 'postgresql'
-    task_db_host: str = '127.0.0.1'
-    task_db_port: int = 5432
-    task_db_username: str = 'postgres'
-    task_db_password: str = 'postgres'
-    task_db_database: str = 'task-data'
-    task_db_echo: bool = False
-    task_db_max_overflow: int = 10
-    task_db_pool_size: int = 20
-    task_db_pool_recycle: int = 3600
-    task_db_pool_timeout: int = 30
-
-
-class AdminSettings(BaseSettings):
-    """
-    超级管理员配置
-    """
-
-    app_super_account: str = 'admin'
-    admin_nick_name: str = '超级管理员'
-    app_super_password: str = 'admin123'
-    admin_email: str = 'admin@example.com'
-    admin_phonenumber: str = '15888888888'
-    admin_sex: str = '0'  # 0男 1女 2未知
-    admin_dept_id: int = 103  # 默认部门ID
-    admin_role_id: int = 1  # 管理员角色ID
-
-
 class RedisSettings(BaseSettings):
     """
     Redis配置
@@ -116,17 +82,6 @@ class MinioSettings(BaseSettings):
     minio_secret_key: str = 'minioadmin'
     minio_secure: bool = False
     minio_bucket: str = 'artwork'
-
-class CrmTokenSettings(BaseSettings):
-    """
-    CRM token配置
-    """
-    crm_token_url: str
-    crm_token_username: str
-    crm_token_safetymark: str
-    crm_token_clientid: str
-    crm_token_secretkey: str
-    crm_token_orgid: str
 
 class GenSettings:
     """
@@ -200,14 +155,6 @@ class CachePathConfig:
     PATH = os.path.join(os.path.abspath(os.getcwd()), 'caches')
     PATHSTR = 'caches'
 
-class HttpSettings(BaseSettings):
-    """
-    HTTP配置
-    """
-    http_timeout: int = 30
-    http_retries: int = 3
-
-
 class GetConfig:
     """
     获取配置
@@ -241,21 +188,6 @@ class GetConfig:
         return DataBaseSettings()
 
     @lru_cache()
-    def get_task_database_config(self):
-        """
-        获取定时任务数据数据库配置
-        """
-        return TaskDataBaseSettings()
-
-    @lru_cache()
-    def get_admin_config(self):
-        """
-        获取超级管理员配置
-        """
-        # 实例化超级管理员配置模型
-        return AdminSettings()
-
-    @lru_cache()
     def get_redis_config(self):
         """
         获取Redis配置
@@ -272,14 +204,6 @@ class GetConfig:
         return MinioSettings()
 
     @lru_cache()
-    def get_crm_token_config(self):
-        """
-        获取CRM token配置
-        """
-        # 实例化CRM token配置模型
-        return CrmTokenSettings()
-
-    @lru_cache()
     def get_gen_config(self):
         """
         获取代码生成配置
@@ -294,14 +218,6 @@ class GetConfig:
         """
         # 实例上传配置
         return UploadSettings()
-
-    @lru_cache()
-    def get_http_config(self):
-        """
-        获取HTTP配置
-        """
-        # 实例化HTTP配置模型
-        return HttpSettings()
 
     @staticmethod
     def parse_cli_args():
@@ -338,19 +254,11 @@ AppConfig = get_config.get_app_config()
 JwtConfig = get_config.get_jwt_config()
 # 数据库配置
 DataBaseConfig = get_config.get_database_config()
-# 定时任务数据数据库配置
-TaskDataBaseConfig = get_config.get_task_database_config()
-# 超级管理员配置
-AdminConfig = get_config.get_admin_config()
 # Redis配置
 RedisConfig = get_config.get_redis_config()
 # Minio配置
 MinioConfig = get_config.get_minio_config()
-# CRM token配置
-CrmTokenConfig = get_config.get_crm_token_config()
 # 代码生成配置
 GenConfig = get_config.get_gen_config()
 # 上传配置
 UploadConfig = get_config.get_upload_config()
-# HTTP配置
-HttpConfig = get_config.get_http_config()

@@ -222,7 +222,7 @@ class ResponseUtil:
         :param background: 可选，响应返回后执行的后台任务
         :return: 错误响应结果
         """
-        result = {'code': HttpStatusConstant.ERROR, 'msg': msg}
+        result = {'code': HttpStatusConstant.INTERNAL_SERVER_ERROR, 'msg': msg}
 
         if data is not None:
             result['data'] = data

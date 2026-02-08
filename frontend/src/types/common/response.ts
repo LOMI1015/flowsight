@@ -21,10 +21,16 @@
 
 /** 基础 API 响应结构 */
 export interface BaseResponse<T = unknown> {
-  /** 状态码 */
+  /** 业务状态码（200 成功，4xx/5xx 异常） */
   code: number
-  /** 消息 */
+  /** 提示信息 */
   msg: string
-  /** 数据 */
-  data: T
+  /** 业务数据（可选，部分接口不返回） */
+  data?: T
+  /** 列表数据（可选，列表接口常用 rows） */
+  rows?: T extends unknown[] ? T : unknown
+  /** 是否成功 */
+  success: boolean
+  /** 响应时间 */
+  time: string
 }

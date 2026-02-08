@@ -41,18 +41,18 @@ class HttpStatusConstant:
     CREATED: 对象创建成功
     ACCEPTED: 请求已经被接受
     NO_CONTENT: 操作已经执行成功，但是没有返回数据
-    MOVED_PERM: 资源已被移除
+    MOVED_PERMANENTLY: 资源已永久移除（301）
     SEE_OTHER: 重定向
     NOT_MODIFIED: 资源没有被修改
     BAD_REQUEST: 参数列表错误（缺少，格式不匹配）
-    UNAUTHORIZED: 未授权
-    FORBIDDEN: 访问受限，授权过期
+    UNAUTHORIZED: 未认证（缺少或无效身份）
+    FORBIDDEN: 无权限/访问被拒绝
     NOT_FOUND: 资源，服务未找到
-    BAD_METHOD: 不允许的http方法
+    METHOD_NOT_ALLOWED: 不允许的 HTTP 方法
     REQUEST_TIMEOUT: 请求超时
     CONFLICT: 资源冲突，或者资源被锁
-    UNSUPPORTED_TYPE: 不支持的数据，媒体类型
-    ERROR: 系统内部错误
+    UNSUPPORTED_MEDIA_TYPE: 不支持的媒体类型
+    INTERNAL_SERVER_ERROR: 系统内部错误
     NOT_IMPLEMENTED: 接口未实现
     BAD_GATEWAY: 网关错误
     SERVICE_UNAVAILABLE: 服务不可用
@@ -64,18 +64,18 @@ class HttpStatusConstant:
     CREATED = 201
     ACCEPTED = 202
     NO_CONTENT = 204
-    MOVED_PERM = 301
+    MOVED_PERMANENTLY = 301
     SEE_OTHER = 303
     NOT_MODIFIED = 304
     BAD_REQUEST = 400
     UNAUTHORIZED = 401
     FORBIDDEN = 403
     NOT_FOUND = 404
-    BAD_METHOD = 405
+    METHOD_NOT_ALLOWED = 405
     REQUEST_TIMEOUT = 408
     CONFLICT = 409
-    UNSUPPORTED_TYPE = 415
-    ERROR = 500
+    UNSUPPORTED_MEDIA_TYPE = 415
+    INTERNAL_SERVER_ERROR = 500
     NOT_IMPLEMENTED = 501
     BAD_GATEWAY = 502
     SERVICE_UNAVAILABLE = 503
@@ -141,26 +141,29 @@ class JobConstant:
 
 class MenuConstant:
     """
-    菜单常量
+    菜单常量（与 sys_menu 表及前端路由约定一致）
 
-    TYPE_DIR: 菜单类型（目录）
-    TYPE_MENU: 菜单类型（菜单）
-    TYPE_BUTTON: 菜单类型（按钮）
-    YES_FRAME: 是否菜单外链（是）
-    NO_FRAME: 是否菜单外链（否）
-    LAYOUT: Layout组件标识
-    PARENT_VIEW: ParentView组件标识
-    INNER_LINK: InnerLink组件标识
+    菜单类型（menu_type）：M=目录 C=菜单 F=按钮
+    是否外链（is_frame）：0=外链（新窗口/iframe） 1=站内路由
+
+    MENU_TYPE_DIR: 目录（M）
+    MENU_TYPE_MENU: 菜单（C）
+    MENU_TYPE_BUTTON: 按钮（F）
+    EXTERNAL_LINK: 外链（is_frame=0）
+    INTERNAL_LINK: 站内路由（is_frame=1）
+    COMPONENT_LAYOUT: 布局组件（一级路由）
+    COMPONENT_PARENT_VIEW: 父级视图组件（多级目录）
+    COMPONENT_INNER_LINK: 内链组件（站内 http 链接）
     """
 
-    TYPE_DIR = 'M'
-    TYPE_MENU = 'C'
-    TYPE_BUTTON = 'F'
-    YES_FRAME = 0
-    NO_FRAME = 1
-    LAYOUT = 'Layout'
-    PARENT_VIEW = 'ParentView'
-    INNER_LINK = 'InnerLink'
+    MENU_TYPE_DIR = 'M'
+    MENU_TYPE_MENU = 'C'
+    MENU_TYPE_BUTTON = 'F'
+    EXTERNAL_LINK = 0
+    INTERNAL_LINK = 1
+    COMPONENT_LAYOUT = 'Layout'
+    COMPONENT_PARENT_VIEW = 'ParentView'
+    COMPONENT_INNER_LINK = 'InnerLink'
 
 
 class GenConstant:

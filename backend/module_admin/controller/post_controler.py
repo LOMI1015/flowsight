@@ -32,7 +32,7 @@ async def get_system_post_list(
     logger.info('获取成功')
     payload = post_page_query_result.model_dump(by_alias=True)
     rows = payload.pop('rows', [])
-    return ResponseUtil.success(data=rows, dict_content=payload)
+    return ResponseUtil.success(rows=rows, dict_content=payload)
 
 
 @postController.post('', dependencies=[Depends(CheckUserInterfaceAuth('system:post:add'))])

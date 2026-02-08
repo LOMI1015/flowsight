@@ -4,7 +4,7 @@
 line-length = 88
 
 # 目标 Python 版本
-target-version = "py39"
+target-version = "py312"
 
 # 排除的文件和目录
 exclude = [
