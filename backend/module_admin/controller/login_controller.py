@@ -11,8 +11,7 @@ from module_admin.annotation.log_annotation import Log
 from module_admin.entity.vo.common_vo import CrudResponseModel
 from module_admin.entity.vo.login_vo import UserLogin, UserRegister, Token
 from module_admin.entity.vo.user_vo import CurrentUserModel, EditUserModel
-from module_admin.service.login_service import CustomOAuth2PasswordRequestForm, LoginService, oauth2_scheme
-from module_admin.service.user_service import UserService
+from domains.admin.application.services import CustomOAuth2PasswordRequestForm, LoginService, UserService, oauth2_scheme
 from utils.log_util import logger
 from utils.response_util import ResponseUtil
 

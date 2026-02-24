@@ -23,6 +23,7 @@ from utils.common_util import CamelCaseUtil
 from utils.log_util import logger
 from utils.message_util import message_service
 from utils.pwd_util import PwdUtil
+from middlewares.trace_middleware import TraceCtx
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 
@@ -254,6 +255,7 @@ class LoginService:
                     role=CamelCaseUtil.transform_result(query_user.get('user_role_info')),
                 ),
             )
+            TraceCtx.set_user_id(current_user.user.user_id)
             return current_user
         else:
             logger.warning('用户token已失效，请重新登录')

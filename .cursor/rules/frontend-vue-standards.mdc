@@ -1,0 +1,31 @@
+---
+description: 前端 Vue/TS 命名与编码规范
+globs: frontend/**/*.{vue,ts,tsx,js,jsx}
+alwaysApply: false
+---
+
+# 前端规范（Vue3 + TypeScript）
+
+- 组件文件名使用 `PascalCase`，组合式函数使用 `useXxx` 命名。
+- 变量/函数使用 `camelCase`，常量使用 `UPPER_SNAKE_CASE`。
+- API 方法命名使用动词前缀：`getDatasetList`、`createJob`、`updateTask`。
+- 页面状态与业务状态分离：`uiState` 与 `domainState` 不混用。
+- 禁止在组件内硬编码后端 URL，统一走 `api/` 层。
+- 异步请求必须有加载态、错误态、空态处理。
+- 表单与表格字段命名需与后端字段映射明确（在适配层转换）。
+
+## 代码示例
+
+```typescript
+// Bad
+const data = await request("/api/v1/data")
+
+// Good
+const datasetList = await datasetApi.getDatasetList(query)
+```
+
+## Vue 组件结构建议
+
+- 页面组件：负责布局和组合，不堆叠复杂业务逻辑。
+- 业务逻辑：抽到 composables（如 `useDatasetFilters`）。
+- 复用 UI：沉淀到 `components/`，保持 props/emit 清晰。

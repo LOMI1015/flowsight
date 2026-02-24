@@ -6,8 +6,7 @@ from config.enums import BusinessType
 from config.get_db import get_db
 from module_admin.annotation.log_annotation import Log
 from module_admin.aspect.interface_auth import CheckUserInterfaceAuth
-from module_admin.service.login_service import LoginService
-from module_admin.service.post_service import PostService
+from domains.admin.application.services import LoginService, PostService
 from module_admin.entity.vo.post_vo import DeletePostModel, PostModel, PostPageQueryModel
 from module_admin.entity.vo.user_vo import CurrentUserModel
 from utils.common_util import bytes2file_response

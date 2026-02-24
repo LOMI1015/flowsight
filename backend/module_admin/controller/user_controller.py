@@ -28,11 +28,7 @@ from module_admin.entity.vo.user_vo import (
     UserRoleQueryModel,
     UserRoleResponseModel,
 )
-from module_admin.service.config_service import ConfigService
-from module_admin.service.login_service import LoginService
-from module_admin.service.user_service import UserService
-from module_admin.service.role_service import RoleService
-from module_admin.service.dept_service import DeptService
+from domains.admin.application.services import ConfigService, DeptService, LoginService, RoleService, UserService
 from utils.common_util import bytes2file_response
 from utils.log_util import logger
 from utils.page_util import PageResponseModel

@@ -1,0 +1,38 @@
+---
+description: 后端 Python 命名与编码规范
+globs: backend/**/*.py
+alwaysApply: false
+---
+
+# 后端 Python 规范（FastAPI）
+
+- Controller 只做参数校验、鉴权和响应封装，不写核心业务逻辑。
+- Service 承载业务逻辑，DAO 仅做数据访问，禁止跨层职责混用。
+- 所有公共函数必须包含类型注解；复杂返回值优先使用 Pydantic 模型。
+- 禁止吞异常：`except` 后必须记录日志并抛出业务异常。
+- 禁止在业务代码中使用 `eval` 执行外部输入。
+- 写接口必须考虑幂等（如 `Idempotency-Key` 或业务唯一键）。
+- 新增接口统一错误结构与错误码，不返回随意字符串错误。
+
+## Python 代码示例
+
+```python
+# Bad
+try:
+    run_task(data)
+except Exception:
+    pass
+
+# Good
+try:
+    run_task(data)
+except Exception as exc:
+    logger.exception("run_task failed", extra={"trace_id": trace_id})
+    raise ServiceException(message="任务执行失败") from exc
+```
+
+## FastAPI 路由规范
+
+- 路由路径使用小写和短横线或名词复数语义。
+- 分页参数统一：`page_num`、`page_size`。
+- 时间统一 UTC 存储，接口输出 ISO8601。

@@ -8,8 +8,7 @@ from module_admin.annotation.log_annotation import Log
 from module_admin.aspect.interface_auth import CheckUserInterfaceAuth
 from module_admin.entity.vo.config_vo import ConfigModel, ConfigPageQueryModel, DeleteConfigModel
 from module_admin.entity.vo.user_vo import CurrentUserModel
-from module_admin.service.config_service import ConfigService
-from module_admin.service.login_service import LoginService
+from domains.admin.application.services import ConfigService, LoginService
 from utils.common_util import bytes2file_response
 from utils.log_util import logger
 from utils.page_util import PageResponseModel

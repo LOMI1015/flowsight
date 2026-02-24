@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 from module_bi.entity.vo.console_vo import ConsoleDataModel, ChartDataModel
-from module_bi.service.console_service import ConsoleService
-from module_admin.service.login_service import LoginService
+from domains.bi.application.services import ConsoleService, LoginService
 from utils.response_util import ResponseUtil
 from utils.log_util import logger
 

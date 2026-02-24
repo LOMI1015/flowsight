@@ -23,7 +23,7 @@ class Span:
         """
         request_before: 处理header信息等, 如记录请求体信息
         """
-        TraceCtx.set_id()
+        TraceCtx.init_request_context(self.scope)
 
     async def request_after(self, message: Message):
         """
@@ -43,7 +43,9 @@ class Span:
             pass
         """
         if message['type'] == 'http.response.start':
-            message['headers'].append((b'request-id', TraceCtx.get_id().encode()))
+            trace_id = TraceCtx.get_id().encode()
+            message['headers'].append((b'request-id', trace_id))
+            message['headers'].append((b'trace-id', trace_id))
         return message
 
 

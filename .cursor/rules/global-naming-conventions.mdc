@@ -1,0 +1,27 @@
+---
+description: 全局命名规范与通用约定
+alwaysApply: true
+---
+
+# FlowSight 全局命名规范
+
+- 统一使用语义化命名，禁止 `temp1`、`data2`、`obj` 这类无语义命名。
+- 后端代码默认使用 `snake_case`（函数、变量、字段）。
+- 类名使用 `PascalCase`，常量使用 `UPPER_SNAKE_CASE`。
+- 路径与目录优先 `kebab-case`，如 `ingestion-service`。
+- API 路径使用名词复数，如 `/datasets`、`/jobs`，避免动词路径。
+- 事件名统一 `domain.entity.action`，如 `dataset.processed`。
+- 时间字段统一命名：`created_at`、`updated_at`、`deleted_at`。
+- 布尔命名使用 `is_`、`has_`、`can_` 前缀。
+
+## 命名示例
+
+```text
+Bad:  function doIt(tmpData)
+Good: function create_dataset_version(dataset_payload)
+```
+
+## 生成代码时的要求
+
+- 新增命名必须与现有模块风格一致，不引入混合风格。
+- 如发现历史命名不一致，优先“新增遵循规范”，必要时在同一变更中小范围修正。

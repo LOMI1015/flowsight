@@ -16,8 +16,7 @@ from module_admin.entity.vo.dict_vo import (
     DictTypePageQueryModel,
 )
 from module_admin.entity.vo.user_vo import CurrentUserModel
-from module_admin.service.dict_service import DictDataService, DictTypeService
-from module_admin.service.login_service import LoginService
+from domains.admin.application.services import DictDataService, DictTypeService, LoginService
 from utils.common_util import bytes2file_response
 from utils.log_util import logger
 from utils.page_util import PageResponseModel

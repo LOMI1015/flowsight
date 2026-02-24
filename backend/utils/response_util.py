@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from starlette.background import BackgroundTask
 from typing import Any, Dict, Mapping, Optional
 from config.constant import HttpStatusConstant
+from config.error_code import ApiErrorCode
 
 
 class ResponseUtil:
@@ -13,10 +14,57 @@ class ResponseUtil:
     响应工具类
     """
 
+    @staticmethod
+    def _build_result(
+        *,
+        code: int,
+        msg: str,
+        success: bool,
+        error_code: str,
+        data: Optional[Any] = None,
+        rows: Optional[Any] = None,
+        dict_content: Optional[Dict] = None,
+        model_content: Optional[BaseModel] = None,
+    ) -> Dict[str, Any]:
+        result: Dict[str, Any] = {
+            'code': code,
+            'msg': msg,
+            'success': success,
+            'time': datetime.now(),
+            'error_code': error_code,
+        }
+        if data is not None:
+            result['data'] = data
+        if rows is not None:
+            result['rows'] = rows
+        if dict_content is not None:
+            result.update(dict_content)
+        if model_content is not None:
+            result.update(model_content.model_dump(by_alias=True))
+        return result
+
+    @staticmethod
+    def _json_response(
+        *,
+        result: Dict[str, Any],
+        status_code: int = status.HTTP_200_OK,
+        headers: Optional[Mapping[str, str]] = None,
+        media_type: Optional[str] = None,
+        background: Optional[BackgroundTask] = None,
+    ) -> Response:
+        return JSONResponse(
+            status_code=status_code,
+            content=jsonable_encoder(result),
+            headers=headers,
+            media_type=media_type,
+            background=background,
+        )
+
     @classmethod
     def success(
         cls,
         msg: str = '操作成功',
+        error_code: str = ApiErrorCode.SUCCESS,
         data: Optional[Any] = None,
         rows: Optional[Any] = None,
         dict_content: Optional[Dict] = None,
@@ -38,31 +86,23 @@ class ResponseUtil:
         :param background: 可选，响应返回后执行的后台任务
         :return: 成功响应结果
         """
-        result = {'code': HttpStatusConstant.SUCCESS, 'msg': msg}
-
-        if data is not None:
-            result['data'] = data
-        if rows is not None:
-            result['rows'] = rows
-        if dict_content is not None:
-            result.update(dict_content)
-        if model_content is not None:
-            result.update(model_content.model_dump(by_alias=True))
-
-        result.update({'success': True, 'time': datetime.now()})
-
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=jsonable_encoder(result),
-            headers=headers,
-            media_type=media_type,
-            background=background,
+        result = cls._build_result(
+            code=HttpStatusConstant.SUCCESS,
+            msg=msg,
+            success=True,
+            error_code=error_code,
+            data=data,
+            rows=rows,
+            dict_content=dict_content,
+            model_content=model_content,
         )
+        return cls._json_response(result=result, headers=headers, media_type=media_type, background=background)
 
     @classmethod
     def failure(
         cls,
         msg: str = '操作失败',
+        error_code: str = ApiErrorCode.BAD_REQUEST,
         data: Optional[Any] = None,
         rows: Optional[Any] = None,
         dict_content: Optional[Dict] = None,
@@ -84,31 +124,23 @@ class ResponseUtil:
         :param background: 可选，响应返回后执行的后台任务
         :return: 失败响应结果
         """
-        result = {'code': HttpStatusConstant.BAD_REQUEST, 'msg': msg}
-
-        if data is not None:
-            result['data'] = data
-        if rows is not None:
-            result['rows'] = rows
-        if dict_content is not None:
-            result.update(dict_content)
-        if model_content is not None:
-            result.update(model_content.model_dump(by_alias=True))
-
-        result.update({'success': False, 'time': datetime.now()})
-
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=jsonable_encoder(result),
-            headers=headers,
-            media_type=media_type,
-            background=background,
+        result = cls._build_result(
+            code=HttpStatusConstant.BAD_REQUEST,
+            msg=msg,
+            success=False,
+            error_code=error_code,
+            data=data,
+            rows=rows,
+            dict_content=dict_content,
+            model_content=model_content,
         )
+        return cls._json_response(result=result, headers=headers, media_type=media_type, background=background)
 
     @classmethod
     def unauthorized(
         cls,
         msg: str = '登录信息已过期，访问系统资源失败',
+        error_code: str = ApiErrorCode.UNAUTHORIZED,
         data: Optional[Any] = None,
         rows: Optional[Any] = None,
         dict_content: Optional[Dict] = None,
@@ -130,31 +162,23 @@ class ResponseUtil:
         :param background: 可选，响应返回后执行的后台任务
         :return: 未认证响应结果
         """
-        result = {'code': HttpStatusConstant.UNAUTHORIZED, 'msg': msg}
-
-        if data is not None:
-            result['data'] = data
-        if rows is not None:
-            result['rows'] = rows
-        if dict_content is not None:
-            result.update(dict_content)
-        if model_content is not None:
-            result.update(model_content.model_dump(by_alias=True))
-
-        result.update({'success': False, 'time': datetime.now()})
-
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=jsonable_encoder(result),
-            headers=headers,
-            media_type=media_type,
-            background=background,
+        result = cls._build_result(
+            code=HttpStatusConstant.UNAUTHORIZED,
+            msg=msg,
+            success=False,
+            error_code=error_code,
+            data=data,
+            rows=rows,
+            dict_content=dict_content,
+            model_content=model_content,
         )
+        return cls._json_response(result=result, headers=headers, media_type=media_type, background=background)
 
     @classmethod
     def forbidden(
         cls,
         msg: str = '该用户无此接口权限',
+        error_code: str = ApiErrorCode.FORBIDDEN,
         data: Optional[Any] = None,
         rows: Optional[Any] = None,
         dict_content: Optional[Dict] = None,
@@ -176,31 +200,23 @@ class ResponseUtil:
         :param background: 可选，响应返回后执行的后台任务
         :return: 未授权响应结果
         """
-        result = {'code': HttpStatusConstant.FORBIDDEN, 'msg': msg}
-
-        if data is not None:
-            result['data'] = data
-        if rows is not None:
-            result['rows'] = rows
-        if dict_content is not None:
-            result.update(dict_content)
-        if model_content is not None:
-            result.update(model_content.model_dump(by_alias=True))
-
-        result.update({'success': False, 'time': datetime.now()})
-
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=jsonable_encoder(result),
-            headers=headers,
-            media_type=media_type,
-            background=background,
+        result = cls._build_result(
+            code=HttpStatusConstant.FORBIDDEN,
+            msg=msg,
+            success=False,
+            error_code=error_code,
+            data=data,
+            rows=rows,
+            dict_content=dict_content,
+            model_content=model_content,
         )
+        return cls._json_response(result=result, headers=headers, media_type=media_type, background=background)
 
     @classmethod
     def error(
         cls,
         msg: str = '接口异常',
+        error_code: str = ApiErrorCode.INTERNAL_ERROR,
         data: Optional[Any] = None,
         rows: Optional[Any] = None,
         dict_content: Optional[Dict] = None,
@@ -222,26 +238,29 @@ class ResponseUtil:
         :param background: 可选，响应返回后执行的后台任务
         :return: 错误响应结果
         """
-        result = {'code': HttpStatusConstant.INTERNAL_SERVER_ERROR, 'msg': msg}
-
-        if data is not None:
-            result['data'] = data
-        if rows is not None:
-            result['rows'] = rows
-        if dict_content is not None:
-            result.update(dict_content)
-        if model_content is not None:
-            result.update(model_content.model_dump(by_alias=True))
-
-        result.update({'success': False, 'time': datetime.now()})
-
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=jsonable_encoder(result),
-            headers=headers,
-            media_type=media_type,
-            background=background,
+        result = cls._build_result(
+            code=HttpStatusConstant.INTERNAL_SERVER_ERROR,
+            msg=msg,
+            success=False,
+            error_code=error_code,
+            data=data,
+            rows=rows,
+            dict_content=dict_content,
+            model_content=model_content,
         )
+        return cls._json_response(result=result, headers=headers, media_type=media_type, background=background)
+
+    @classmethod
+    def http_exception(
+        cls,
+        *,
+        code: int,
+        msg: str,
+        error_code: str,
+        status_code: int,
+    ) -> Response:
+        result = cls._build_result(code=code, msg=msg, success=False, error_code=error_code)
+        return cls._json_response(result=result, status_code=status_code)
 
     @classmethod
     def streaming(

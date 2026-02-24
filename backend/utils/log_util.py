@@ -22,9 +22,11 @@ class LoggerInitializer:
     @staticmethod
     def __filter(log: Dict):
         """
-        自定义日志过滤器，添加trace_id
+        自定义日志过滤器，注入链路字段
         """
         log['trace_id'] = TraceCtx.get_id()
+        log['user_id'] = TraceCtx.get_user_id()
+        log['dataset_id'] = TraceCtx.get_dataset_id()
         return log
 
     def init_log(self):
@@ -35,6 +37,8 @@ class LoggerInitializer:
         format_str = (
             '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | '
             '<cyan>{trace_id}</cyan> | '
+            '<cyan>{user_id}</cyan> | '
+            '<cyan>{dataset_id}</cyan> | '
             '<level>{level: <8}</level> | '
             '<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - '
             '<level>{message}</level>'

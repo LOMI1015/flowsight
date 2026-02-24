@@ -10,10 +10,7 @@ from module_admin.aspect.interface_auth import CheckUserInterfaceAuth
 from module_admin.entity.vo.dept_vo import DeptModel
 from module_admin.entity.vo.role_vo import AddRoleModel, DeleteRoleModel, RoleModel, RolePageQueryModel
 from module_admin.entity.vo.user_vo import CrudUserRoleModel, CurrentUserModel, UserRolePageQueryModel
-from module_admin.service.dept_service import DeptService
-from module_admin.service.login_service import LoginService
-from module_admin.service.role_service import RoleService
-from module_admin.service.user_service import UserService
+from domains.admin.application.services import DeptService, LoginService, RoleService, UserService
 from utils.common_util import bytes2file_response
 from utils.log_util import logger
 from utils.page_util import PageResponseModel

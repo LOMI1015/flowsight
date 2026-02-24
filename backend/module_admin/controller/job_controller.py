@@ -15,9 +15,7 @@ from module_admin.entity.vo.job_vo import (
     JobPageQueryModel,
 )
 from module_admin.entity.vo.user_vo import CurrentUserModel
-from module_admin.service.job_log_service import JobLogService
-from module_admin.service.job_service import JobService
-from module_admin.service.login_service import LoginService
+from domains.admin.application.services import JobLogService, JobService, LoginService
 from utils.common_util import bytes2file_response
 from utils.log_util import logger
 from utils.page_util import PageResponseModel

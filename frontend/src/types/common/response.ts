@@ -23,6 +23,8 @@
 export interface BaseResponse<T = unknown> {
   /** 业务状态码（200 成功，4xx/5xx 异常） */
   code: number
+  /** 稳定业务错误码（用于跨版本兼容判断） */
+  error_code?: string
   /** 提示信息 */
   msg: string
   /** 业务数据（可选，部分接口不返回） */

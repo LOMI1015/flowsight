@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException
 from pydantic_validation_decorator import FieldValidationError
+from config.constant import HttpStatusConstant
+from config.error_code import ApiErrorCode
 from exceptions.exception import (
     AuthException,
     LoginException,
@@ -10,7 +12,7 @@ from exceptions.exception import (
     ServiceWarning,
 )
 from utils.log_util import logger
-from utils.response_util import jsonable_encoder, JSONResponse, ResponseUtil
+from utils.response_util import ResponseUtil
 
 
 def handle_exception(app: FastAPI):
@@ -21,29 +23,29 @@ def handle_exception(app: FastAPI):
     # 自定义token检验异常
     @app.exception_handler(AuthException)
     async def auth_exception_handler(request: Request, exc: AuthException):
-        return ResponseUtil.unauthorized(data=exc.data, msg=exc.message)
+        return ResponseUtil.unauthorized(data=exc.data, msg=exc.message, error_code=ApiErrorCode.TOKEN_INVALID)
 
     # 自定义登录检验异常
     @app.exception_handler(LoginException)
     async def login_exception_handler(request: Request, exc: LoginException):
-        return ResponseUtil.failure(data=exc.data, msg=exc.message)
+        return ResponseUtil.failure(data=exc.data, msg=exc.message, error_code=ApiErrorCode.LOGIN_FAILED)
 
     # 自定义模型检验异常
     @app.exception_handler(ModelValidatorException)
     async def model_validator_exception_handler(request: Request, exc: ModelValidatorException):
         logger.warning(exc.message)
-        return ResponseUtil.failure(data=exc.data, msg=exc.message)
+        return ResponseUtil.failure(data=exc.data, msg=exc.message, error_code=ApiErrorCode.MODEL_VALIDATION_FAILED)
 
     # 自定义字段检验异常
     @app.exception_handler(FieldValidationError)
     async def field_validation_error_handler(request: Request, exc: FieldValidationError):
         logger.warning(exc.message)
-        return ResponseUtil.failure(msg=exc.message)
+        return ResponseUtil.failure(msg=exc.message, error_code=ApiErrorCode.FIELD_VALIDATION_FAILED)
 
     # 自定义权限检验异常
     @app.exception_handler(PermissionException)
     async def permission_exception_handler(request: Request, exc: PermissionException):
-        return ResponseUtil.forbidden(data=exc.data, msg=exc.message)
+        return ResponseUtil.forbidden(data=exc.data, msg=exc.message, error_code=ApiErrorCode.PERMISSION_DENIED)
 
     # 自定义服务异常
     @app.exception_handler(ServiceException)
@@ -51,23 +53,34 @@ def handle_exception(app: FastAPI):
         logger.error(exc.message)
         # 对于业务逻辑错误（如超级管理员检查失败），返回400状态码而不是500
         # 这样可以避免前端重试机制触发
-        return ResponseUtil.failure(data=exc.data, msg=exc.message)
+        return ResponseUtil.failure(data=exc.data, msg=exc.message, error_code=ApiErrorCode.SERVICE_ERROR)
 
     # 自定义服务警告
     @app.exception_handler(ServiceWarning)
     async def service_warning_handler(request: Request, exc: ServiceWarning):
         logger.warning(exc.message)
-        return ResponseUtil.failure(data=exc.data, msg=exc.message)
+        return ResponseUtil.failure(data=exc.data, msg=exc.message, error_code=ApiErrorCode.BAD_REQUEST)
 
     # 处理其他http请求异常
     @app.exception_handler(HTTPException)
     async def http_exception_handler(request: Request, exc: HTTPException):
-        return JSONResponse(
-            content=jsonable_encoder({'code': exc.status_code, 'msg': exc.detail}), status_code=exc.status_code
+        status_code = exc.status_code
+        error_code_map = {
+            HttpStatusConstant.BAD_REQUEST: ApiErrorCode.BAD_REQUEST,
+            HttpStatusConstant.UNAUTHORIZED: ApiErrorCode.UNAUTHORIZED,
+            HttpStatusConstant.FORBIDDEN: ApiErrorCode.FORBIDDEN,
+            HttpStatusConstant.NOT_FOUND: ApiErrorCode.NOT_FOUND,
+            HttpStatusConstant.METHOD_NOT_ALLOWED: ApiErrorCode.METHOD_NOT_ALLOWED,
+        }
+        return ResponseUtil.http_exception(
+            code=status_code,
+            msg=str(exc.detail),
+            error_code=error_code_map.get(status_code, ApiErrorCode.INTERNAL_ERROR),
+            status_code=status_code,
         )
 
     # 处理其他异常
     @app.exception_handler(Exception)
     async def exception_handler(request: Request, exc: Exception):
         logger.exception(exc)
-        return ResponseUtil.error(msg=str(exc))
+        return ResponseUtil.error(msg=str(exc), error_code=ApiErrorCode.INTERNAL_ERROR)

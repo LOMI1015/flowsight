@@ -4,8 +4,7 @@ from config.get_db import get_db
 from module_admin.annotation.pydantic_annotation import as_query
 from module_admin.entity.vo.common_vo import UploadRecordPageQueryModel
 from module_admin.entity.vo.user_vo import CurrentUserModel
-from module_admin.service.common_service import CommonService
-from module_admin.service.login_service import LoginService
+from domains.admin.application.services import CommonService, LoginService
 from utils.log_util import logger
 from utils.page_util import PageResponseModel
 from utils.response_util import ResponseUtil
