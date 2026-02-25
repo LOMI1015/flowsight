@@ -4,6 +4,7 @@ from config.env import AppConfig
 from config.get_db import init_create_table, init_admin_user
 from config.get_redis import RedisUtil
 from config.get_scheduler import SchedulerUtil
+from domains.ingestion.events import register_ingestion_event_handlers
 from domains.route_registry import get_all_domain_routes
 from exceptions.handle import handle_exception
 from middlewares.handle import handle_middleware
@@ -16,6 +17,7 @@ from utils.log_util import logger
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info(f'{AppConfig.app_name}开始启动')
+    register_ingestion_event_handlers()
     worship()
     await init_create_table()
     await init_admin_user()  # 初始化超级管理员

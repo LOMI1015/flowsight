@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  ingestion-service:
+    build:
+      context: .
+    container_name: flowsight-ingestion-service
+    ports:
+      - "9201:9201"
+    environment:
+      - INGESTION_DB_URL=postgresql+asyncpg://flowsight:flowsight@postgres:5432/flowsight
+      - INGESTION_DB_SCHEMA=ingestion
+      - INGESTION_REDIS_URL=redis://redis:6379/0
+      - INGESTION_DATASET_INGESTED_STREAM_KEY=dataset.events
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - ingestion-net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: flowsight-ingestion-postgres
+    environment:
+      - POSTGRES_USER=flowsight
+      - POSTGRES_PASSWORD=flowsight
+      - POSTGRES_DB=flowsight
+    ports:
+      - "5432:5432"
+    networks:
+      - ingestion-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: flowsight-ingestion-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - ingestion-net
+
+networks:
+  ingestion-net:
+    driver: bridge

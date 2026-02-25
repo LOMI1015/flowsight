@@ -122,56 +122,62 @@
 
 - [x] 在单体内先按领域重组目录（不拆进程）
 - [x] 抽象应用服务层（禁止 Controller 直连 DAO）
-- [ ] 将“上传 + 解析 + 入库”链路从通用逻辑独立为 ingestion domain
-- [ ] 定义内部事件总线接口（先可用进程内实现）
-- [ ] 增加幂等键机制（`dataset_id + version`）
+- [x] 将“上传 + 解析 + 入库”链路从通用逻辑独立为 ingestion domain
+- [x] 定义内部事件总线接口（先可用进程内实现）
+- [x] 增加幂等键机制（`dataset_id + version`）
 
 **交付物**
-- [ ] `docs/architecture/modular-monolith.md`
-- [ ] ingestion 领域内部接口文档
+- [x] `docs/architecture/modular-monolith.md`
+- [x] `docs/architecture/ingestion-internal-interface.md`
 
 **验收标准**
-- [ ] 核心数据上传流程可独立测试、可重复执行
+- [x] 核心数据上传流程可独立测试、可重复执行
 
 ---
 
 ## Phase 2：拆出第一个微服务 ingestion（2~3 周）
 
-- [ ] 新建 `services/ingestion-service`
-- [ ] 提供接口：创建数据集、上传文件、查询接入任务状态
-- [ ] 文件只负责入湖与登记，不做重处理
-- [ ] 引入 Redis Streams：发布 `dataset.ingested`
-- [ ] 单独数据库 schema（如 `ingestion`）
-- [ ] 网关接入新服务路由
+- [x] 新建 `services/ingestion-service`
+- [x] 提供接口：创建数据集、上传文件、查询接入任务状态
+- [x] 文件只负责入湖与登记，不做重处理
+- [x] 引入 Redis Streams：发布 `dataset.ingested`
+- [x] 单独数据库 schema（如 `ingestion`）
+- [x] 网关接入新服务路由
 
 **交付物**
-- [ ] ingestion OpenAPI 文档
-- [ ] Redis Stream topic 约定文档
-- [ ] 服务 Dockerfile / compose 配置
+- [x] `docs/services/ingestion-openapi.md`
+- [x] `docs/messaging/redis-stream-topics.md`
+- [x] 服务 Dockerfile / compose 配置
 
 **验收标准**
-- [ ] ingestion 服务可独立部署与扩缩容
-- [ ] 失败重试不产生重复数据（幂等通过）
+- [x] ingestion 服务可独立部署与扩缩容
+- [x] 失败重试不产生重复数据（幂等通过）
 
 ---
 
 ## Phase 3：拆编排与处理（3~6 周）
 
-- [ ] 新建 `workflow-orchestrator-service`
-- [ ] 新建 `processing-service`（worker 形态）
-- [ ] 将处理逻辑从管理服务迁移到 processing
-- [ ] 配置重试策略（指数退避 + 最大重试次数）
-- [ ] 配置死信队列（DLQ）与人工补偿机制
-- [ ] 打通状态回写到 metadata（`PENDING/RUNNING/FAILED/SUCCEEDED`）
+- [x] 新建 `workflow-orchestrator-service`
+- [x] 新建 `processing-service`（worker 形态）
+- [x] 将处理逻辑从管理服务迁移到 processing
+- [x] 配置重试策略（指数退避 + 最大重试次数）
+- [x] 配置死信队列（DLQ）与人工补偿机制
+- [x] 打通状态回写到 metadata（`PENDING/RUNNING/FAILED/SUCCEEDED`）
 
 **交付物**
-- [ ] 工作流状态机文档
-- [ ] 失败处理与补偿 SOP
-- [ ] 处理任务性能基线（吞吐/延迟）
+- [x] `docs/architecture/workflow-state-machine.md`
+- [x] `docs/ops/failure-compensation-sop.md`
+- [x] `docs/ops/processing-performance-baseline.md`
 
 **验收标准**
-- [ ] 单任务失败不影响全局队列消费
-- [ ] 异常任务可追踪、可回放、可补偿
+- [x] 单任务失败不影响全局队列消费
+- [x] 异常任务可追踪、可回放、可补偿
+
+**验收记录（2026-02-25）**
+- 已完成编排与处理服务拆分：`workflow-orchestrator-service` 与 `processing-service`。
+- 已完成处理逻辑从管理服务迁移，ingestion 仅负责入湖登记与事件投递。
+- 已落地重试策略（指数退避）与 DLQ 机制，并提供人工补偿脚本。
+- 已打通 metadata 状态回写链路（`PENDING/RUNNING/FAILED/SUCCEEDED`）。
 
 ---
 
